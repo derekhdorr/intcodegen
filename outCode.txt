@@ -1,0 +1,8 @@
+MOV eax, c
+MOV c, eax;
+MOV eax, a
+MOV eax, a 
+ADD eax, b
+MOV a, eax;
+MOV eax, b
+;
