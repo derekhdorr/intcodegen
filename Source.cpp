@@ -1,4 +1,8 @@
-//simple lexer assignment 
+// CS323_ICG.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include "pch.h"
+//simple lexer assignment
 //Derek Dorr, Jonathan Ungheanu, Adam Weesner
 //CPSC 323 Fall 2018
 //Shohrat Geldiyev
@@ -74,6 +78,7 @@ int main() {
 		tokenVec = Lexer(text);
 		//Cheats the FSM and re-assigns 'strings' to pre defined lexemes
 		//maybe if i made the vector global i can do this in get_fsm_col...
+		cout << "\nSIZE: " << tokenVec.size() << endl;
 		for (unsigned j = 0; j < tokenVec.size(); j++) {
 
 			if (isKeyword(tokenVec[j].token) == true) {
@@ -203,28 +208,56 @@ bool isKeyword(string token) {
 	}
 	return false;
 }
-
+//representing sample code as assembly to outfile
 void codeGen(vector<TokenType>tokenVec) {
 	ofstream outCode;
 	outCode.open("outCode.txt");
+	unsigned int j = 0;
 	for (unsigned i = 0; i < tokenVec.size(); i++) {
-		
+		j++;
+		//assigning values to vars
 		if (tokenVec[i].lexemeName == "IDENTIFIER") {
-			outCode << "MOV eax, " << tokenVec[i].token << "\n";
-		}
-		else if (tokenVec[i].lexemeName == "OPERATOR") {
-			if (tokenVec[i].token == "+") {
-
-						outCode << "MOV eax, a \nADD eax, b\n";
+			if (tokenVec[j].token == "=") {
+				if (tokenVec[j + 1].lexemeName == "IDENTIFIER") {
+					if (tokenVec[j + 2].lexemeName == "OPERATOR") {
+						if (tokenVec[j + 3].lexemeName == "IDENTIFIER" || tokenVec[j + 3].lexemeName == "REAL") {
+							string assTest = tokenVec[j + 2].token;
+							//add
+							if (assTest == "+") {
+								outCode << "MOV ax, " << tokenVec[j + 1].token << "\n";
+								outCode << "ADD ax, " << tokenVec[j + 3].token << "\n";
+								outCode << "MOV " << tokenVec[i].token << ", ax\n";		//still need to find a way to see if ax,bx,cx,dx are taken.
+							}
+						}
+					}
 				}
-				outCode << "MOV " << tokenVec[i - 1].token << ", eax;\n";
+				else if (tokenVec[i].lexemeName == "IDENTIFIER") {
+					if (tokenVec[j].token == "=") {
+						if (tokenVec[j + 1].lexemeName == "REAL") {
+							if (tokenVec[j + 2].lexemeName == "SEPARATOR") {
+								outCode << "->MOV ax, " << tokenVec[j + 1].token << "\n";
+								outCode << "->MOV " << tokenVec[i].token << ", ax\n";
+							}
+						}
+					}
+				}
 			}
-		
+		}
 		else {
-			outCode << tokenVec[i].token << "\n";
+			outCode << "\nERROR\n" << tokenVec[i].token << endl;
 		}
 	}
 	outCode.close();
-
-	
 }
+
+
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
